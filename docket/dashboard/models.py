@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+# Docket model
 class Docket(models.Model):
     name = models.CharField(max_length=100)
     start_time = models.TimeField()
