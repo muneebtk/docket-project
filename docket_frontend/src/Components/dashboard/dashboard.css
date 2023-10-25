@@ -1,0 +1,19 @@
+.card{
+    margin:5px 15px;
+}
+.single_card:hover{
+    background-color:aliceblue;
+}
+.button{
+    display: flex;
+    justify-content: end;
+    margin-top: 80px ;
+    margin-bottom: 10px;
+}
+.main{
+    width: 100%;
+}
+.form{
+    display: flex;
+    flex-direction: column;
+}
