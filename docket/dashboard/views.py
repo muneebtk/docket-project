@@ -10,7 +10,9 @@ from . models import Docket
 from . serializer import DocketSerializer
 from datetime import datetime
 
-# @api_view(['POST'])
+# docket form submission and get details from the excel file
+
+
 class docket(APIView):
     def post(self, request):
         try:
@@ -22,8 +24,10 @@ class docket(APIView):
             rate_per_hour = data.get('ratePerHour')
             supplier_name = data.get('supplier')
             po = data.get('PO')
-            start_time = datetime.strptime(start_time, '%I:%M %p').strftime('%H:%M:%S')
-            end_time = datetime.strptime(end_time, '%I:%M %p').strftime('%H:%M:%S')
+            start_time = datetime.strptime(
+                start_time, '%I:%M %p').strftime('%H:%M:%S')
+            end_time = datetime.strptime(
+                end_time, '%I:%M %p').strftime('%H:%M:%S')
             Docket.objects.create(
                 name=name,
                 start_time=start_time,
@@ -36,39 +40,28 @@ class docket(APIView):
             response_status = status.HTTP_201_CREATED
             message = 'Docket Created successfully!.'
         except Exception as e:
-            print(e, 'ecception')
             response_status = status.HTTP_202_ACCEPTED
             message = 'Something went wrong!.'
-        return Response({'message' : message}, status=response_status)
-        
+        return Response({'message': message}, status=response_status)
+
     def get(self, request):
         dockets = Docket.objects.all()
         serializer = DocketSerializer(dockets, many=True)
         path = os.path.join(settings.BASE_DIR, 'files\export29913.xlsx')
-        print(path)
-        df=None
-        print(request.GET, '8888888888888')
+        df = None
         if 'supplier' in request.GET:
-            print('IN PO sectionssssss', request.GET.get('po'))
             supplier = request.GET.get('supplier')
             path = os.path.join(settings.BASE_DIR, 'files\export29913.xlsx')
             df = pd.read_excel(path)
             filtered_df = df[df['Supplier'] == supplier]['PO Number'].dropna()
-            
-            # filtered_df['Supplier'] = filtered_df['Supplier'].astype(int)
-            print('in supplier ger-------------', filtered_df)
-            return Response({'df':filtered_df})
+            return Response({'df': filtered_df})
         try:
             df = pd.read_excel(path)['Supplier']
             df = df.dropna().drop_duplicates()
-            # df['Supplier'] = df['Supplier'].drop_duplicates()
-            # print(df, 'dff')
         except Exception as e:
-            print(e)
-            # print('in except')
-        # print(df, len(df))
+            pass
         data = {
-            'df' : df,
-            'dockets' : serializer.data
+            'df': df,
+            'dockets': serializer.data
         }
-        return Response({'data' : data}, status=status.HTTP_200_OK)
+        return Response({'data': data}, status=status.HTTP_200_OK)
